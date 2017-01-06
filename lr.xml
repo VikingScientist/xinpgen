@@ -2,7 +2,7 @@
 
 <simulation>
 
-  <adaptive>
+  <adaptive default="False">
     <maxstep   type="child">
       <value   type="attribute" value="int"/>
     </maxstep>
@@ -15,7 +15,7 @@
     <errtol    type="child">
       <value   type="attribute" value="float"/>
     </errtol>
-    <knot_mult type="child">
+    <knot_mult type="child" default="1">
       <value   type="attribute" value="int"/>
     </knot_mult>
     <use_norm type="child">

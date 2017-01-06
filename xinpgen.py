@@ -39,26 +39,33 @@ class Application(tk.Frame):
 
 		# self.frames[0].rowconfigure(0,weight=1)
 		# self.frames[0].columnconfigure(0,weight=1)
-		tabnames = [t for t in self.notebook.tabs()]
-		self.overview = tk.Frame(self)
-		self.overview.checkbox = []
-		for f in self.frames:
-			isOn = tk.IntVar()
-			checkbox = ttk.Checkbutton(self.overview, state=tk.NORMAL, text=f.name, variable=isOn, onvalue=1, offvalue=0)
-			checkbox.isOn = isOn
-			checkbox.invoke()
-			# silly lambda functions require the "checkbox=checkbox" hack when used inside for-loops
-			checkbox.config(command = lambda checkbox=checkbox: self.activateFrame(checkbox))
-			checkbox.grid(column=0, sticky=tk.W)
-		self.notebook.add(self.overview, text="Overview")
 
 		for f in self.frames:
 			self.notebook.add(f, text=f.name)
 
+		self.overview = tk.Frame(self)
+		self.overview.checkbox = []
+		for f in self.frames:
+			isOn = tk.IntVar()
+			checkbox = tk.Checkbutton(self.overview, state=tk.NORMAL, text=f.name, variable=isOn, onvalue=1, offvalue=0, font=font.Font())
+			checkbox.isOn = isOn
+			checkbox.invoke()
+			checkbox.config(command = lambda checkbox=checkbox: self.activateFrame(checkbox))
+			if f.inactive:
+				checkbox.invoke()
+			# silly lambda functions require the "checkbox=checkbox" hack when used inside for-loops
+			checkbox.grid(column=0, sticky=tk.W)
+
+		# let Overview be at the start, and with focus
+		self.notebook.insert(0, self.overview, text="Overview")
+		self.notebook.select(0)
+
+
+		# add the button panel at the bottom
 		separator = ttk.Separator(self)
 		separator.grid(  row=1, sticky=tk.E+tk.W)
 
-		buttonFrame = tk.Frame(self, background="pink")
+		buttonFrame = tk.Frame(self)
 		buttonFrame.grid(row=2, sticky=tk.E+tk.W)
 		self.saveButton = tk.Button(buttonFrame, text='Save', command=self.save)
 		self.saveButton.pack(side='left', expand=True)
@@ -82,9 +89,9 @@ class Application(tk.Frame):
 		self.italic = font.Font(slant='italic')
 		self.bold   = font.Font(weight='bold')
 		thisFrame = tk.Frame(self)
-		thisFrame.name = root.tag
+		thisFrame.name   = root.tag
+		thisFrame.inactive = ('default' in root.attrib and (root.attrib['default'] == 'False' or root.attrib['default'] == '0'))
 		self.frames.append(thisFrame)
-		# self.notebook.add(thisFrame, text=root.tag)
 		self.rowcount = 0
 		self.parseTag(root, thisFrame)
 
@@ -114,22 +121,33 @@ class Application(tk.Frame):
 				textField = ttk.Combobox(frame, values=choices)
 				textField.set(choices[0])
 				textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+				if 'default' in child.attrib:
+					textField.set(child.attrib['default'])
 			elif child.attrib['value'] == 'int':
 				okayCommand = frame.register(self.isInteger)
 				textField = tk.Entry( frame, validate='all', validatecommand=(okayCommand, '%d', '%i', '%S'))
 				textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+				if 'default' in child.attrib:
+					textField.set(child.attrib['default'])
 			elif child.attrib['value'] == 'float':
 				okayCommand = frame.register(self.isFloat)
 				textField = tk.Entry( frame, validate='all', validatecommand=(okayCommand, '%d', '%i', '%S'))
 				textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+				if 'default' in child.attrib:
+					textField.insert(0,child.attrib['default'])
 			elif child.attrib['value'] == 'bool':
 				isOn = tk.IntVar()
 				checkbox = tk.Checkbutton(frame, variable=isOn)
 				checkbox.isOn = isOn
 				checkbox.grid(row=self.rowcount, column=1, sticky=tk.W)
+				if 'default' in child.attrib and child.attrib['default'] == 'True':
+					checkbox.invoke()
 			else:
 				textField = tk.Entry( frame)
 				textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+				if 'default' in child.attrib:
+					textField.insert(0,child.attrib['default'])
+
 
 			if 'help' in child.attrib:
 				helpButton = tk.Button(frame, text='help', command=lambda title=child.tag, msg=child.attrib['help']: self.helpPopup(title, msg))
@@ -150,22 +168,32 @@ class Application(tk.Frame):
 					textField = ttk.Combobox(frame, values=choices)
 					textField.set(choices[0])
 					textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+					if 'default' in child.attrib:
+						textField.set(child.attrib['default'])
 				elif child.attrib['value'] == 'int':
 					okayCommand = frame.register(self.isInteger)
 					textField = tk.Entry( frame, validate='all', validatecommand=(okayCommand, '%d', '%i', '%S'))
 					textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+					if 'default' in child.attrib:
+						textField.insert(0,child.attrib['default'])
 				elif child.attrib['value'] == 'float':
 					okayCommand = frame.register(self.isFloat)
 					textField = tk.Entry( frame, validate='all', validatecommand=(okayCommand, '%d', '%i', '%S'))
 					textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+					if 'default' in child.attrib:
+						textField.insert(0,child.attrib['default'])
 				elif child.attrib['value'] == 'bool':
 					isOn = tk.IntVar()
 					checkbox = tk.Checkbutton(frame, variable=isOn)
 					checkbox.isOn = isOn
 					checkbox.grid(row=self.rowcount, column=1, sticky=tk.W)
+					if 'default' in child.attrib and child.attrib['default'] == 'True':
+						checkbox.invoke()
 				else:
 					textField = tk.Entry( frame)
 					textField.grid(row=self.rowcount, column=1, sticky=tk.W+tk.E)
+					if 'default' in child.attrib:
+						textField.insert(0,child.attrib['default'])
 			else:
 				ttk.Label(frame, text='').grid(row=self.rowcount, column=1)
 

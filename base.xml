@@ -3,7 +3,7 @@
 <simulation>
 
   <geometry>
-    <dim type="attribute" value="enum" help="Number of spatial dimensions">
+    <dim type="attribute" value="enum" help="Number of spatial dimensions" default="2">
       <enum>1</enum>
       <enum>2</enum>
       <enum>3</enum>
@@ -52,7 +52,7 @@
     </topologysets>
   </geometry>
 
-  <boundaryconditions>
+  <boundaryconditions default="False">
     <propertyfile type="child" value="string"/>
     <propertycodes type="child">
       <code type="child" array="true">
@@ -92,7 +92,7 @@
     </dirichlet>
   </boundaryconditions>
 
-  <linearsolver>
+  <linearsolver default="False">
     <class type="child" value="enum">
       <enum>dense</enum>
       <enum>spr</enum>
@@ -101,19 +101,19 @@
       <enum>petsc</enum>
       <enum>istl</enum>
     </class>
-    <verbosity                type="attribute" value="bool"/>
+    <verbosity                type="attribute" value="bool" default="True"/>
     <type                     type="child" value="string"/>
-    <gmres_restart_iterations type="child" value="int"/>
+    <gmres_restart_iterations type="child" value="int"   default="100"/>
     <pc                       type="child" value="string"/>
     <schur                    type="child" value="string"/>
     <block                    type="child" value="string"/>
-    <atol                     type="child" value="float"/>
-    <rtol                     type="child" value="float"/>
-    <dtol                     type="child" value="float"/>
-    <maxits                   type="child" value="int"/>
+    <atol                     type="child" value="float" default="1e-20"/>
+    <rtol                     type="child" value="float" default="1e-6"/>
+    <dtol                     type="child" value="float" default="1e6"/>
+    <maxits                   type="child" value="int"   default="1000"/>
   </linearsolver>
 
-  <eigensolver>
+  <eigensolver default="False">
     <mode  type="child" value="int"/>
     <nev   type="child" value="int"/>
     <ncv   type="child" value="int"/>
@@ -169,15 +169,15 @@
     </projection>
   </postprocessing>
 
-  <console>
+  <console default="False">
     <logging type="child">
       <output_pid    type="attribute" value="int"/>
       <output_prefix type="attribute" value="string"/>
     </logging>
   </console>
 
-  <discretization>
-    <discretization type="child" value="enum">
+  <discretization default="False">
+    <discretization type="child" value="enum" default="splines">
       <enum>splines</enum>
       <enum>lrsplines</enum>
       <enum>lagrange</enum>
