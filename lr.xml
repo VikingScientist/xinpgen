@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <adaptive>
+    <maxstep   type="child">
+      <value   type="attribute" value="int"/>
+    </maxstep>
+    <beta      type="child">
+      <value   type="attribute" value="int"/>
+    </beta>
+    <maxdof    type="child">
+      <value   type="attribute" value="int"/>
+    </maxdof>
+    <errtol    type="child">
+      <value   type="attribute" value="float"/>
+    </errtol>
+    <knot_mult type="child">
+      <value   type="attribute" value="int"/>
+    </knot_mult>
+    <use_norm type="child">
+      <value   type="attribute" value="int"/>
+    </use_norm>
+    <use_sub_norm type="child">
+      <value   type="attribute" value="int"/>
+    </use_sub_norm>
+    <scheme    type="child" value="enum">
+      <enum>isotropic_function</enum>
+      <enum>maxspan</enum>
+      <enum>minspan</enum>
+    </scheme>
+    <store_eps_mesh            type="child" value="bool"/>
+    <test_linear_independence  type="child" value="bool"/>
+  </adaptive>
+
+</simulation>

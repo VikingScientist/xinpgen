@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <geometry>
+    <dim type="attribute" value="enum" help="Number of spatial dimensions">
+      <enum>1</enum>
+      <enum>2</enum>
+      <enum>3</enum>
+    </dim>
+    <patchfile type="child" value="string" help="GoTools file (.g2) describing the (multipatch) geometry"/>
+    <nodefile  type="child" value="string" help="Connectivity file (.gno or .hdf5) describing the multipatch connections"/>
+    <partitioning  type="child" value="string" help="Connectivity file (.gno or .hdf5) describing the multipatch connections">
+      <procs type="attribute" value="int" help="Number of processors"/>
+      <part  type="child" array="true">
+        <proc  type="attribute" value="int"/>
+        <lower type="attribute" value="int"/>
+        <upper type="attribute" value="int"/>
+      </part>
+      <nperproc type="attribute" value="int"/>
+    </partitioning>
+    <raiseorder type="child" help="Raise the polynomial degree of the discretization">
+      <patch type="attribute" value="int" help="Local patch enumeration to refine"/>
+      <u     type="attribute" value="int" help="Order elevation in u-direction"/>
+      <v     type="attribute" value="int" help="Order elevation in v-direction"/>
+      <w     type="attribute" value="int" help="Order elevation in w-direction"/>
+    </raiseorder>
+
+    <refine type="child">
+      <type type="attribute" value="enum" help="h-refine geometry by inserting more knots">
+        <enum>uniform</enum>
+      </type>
+      <patch type="attribute" value="int" help="Local patch enumeration to refine"/>
+      <u     type="attribute" value="int" help="Number of refinements in u-direction"/>
+      <v     type="attribute" value="int" help="Number of refinements in v-direction"/>
+      <w     type="attribute" value="int" help="Number of refinements in w-direction"/>
+    </refine>
+
+    <topologysets type="child">
+      <set type="child" array="true">
+        <name type="attribute" value="string" help="identification string"/>
+        <type type="attribute" value="enum"   help="boundary type">
+          <enum>vertex</enum>
+          <enum>edge</enum>
+          <enum>face</enum>
+          <enum>volume</enum>
+        </type>
+        <item type="child" value="int" array="true" help="local index">
+          <patch type="attribute" value="int"/>
+        </item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <boundaryconditions>
+    <propertyfile type="child" value="string"/>
+    <propertycodes type="child">
+      <code type="child" array="true">
+        <value type="attribute" value="int"/>
+        <patch type="child" value="int">
+          <face   type="attribute" value="int"/>
+          <edge   type="attribute" value="int"/>
+          <vertex type="attribute" value="int"/>
+          <index  type="attribute" value="int"/>
+        </patch>
+      </code>
+    </propertycodes>
+    <neumann type="child">
+      <set  type="attribute" value="string"/>
+      <type type="attribute" value="enum">
+        <enum>anasol</enum>
+        <enum>generic</enum>
+      </type>
+      <direction  type="attribute" value="int"/>
+      <code       type="attribute" value="int"/>
+    </neumann>
+    <dirichlet type="child" value="string">
+      <component type="attribute" value="int"/>
+      <set       type="attribute" value="string"/>
+      <type      type="attribute" value="enum">
+        <enum>expression</enum>
+        <enum>field</enum>
+        <enum>anasol</enum>
+      </type>
+      <axes      type="attribute" value="enum">
+        <enum> </enum>
+        <enum>local projected</enum>
+        <enum>local</enum>
+        <enum>global</enum>
+      </axes>
+      <basis     type="attribute" value="int"/>
+    </dirichlet>
+  </boundaryconditions>
+
+  <linearsolver>
+    <class type="child" value="enum">
+      <enum>dense</enum>
+      <enum>spr</enum>
+      <enum>superlu</enum>
+      <enum>samg</enum>
+      <enum>petsc</enum>
+      <enum>istl</enum>
+    </class>
+    <verbosity                type="attribute" value="bool"/>
+    <type                     type="child" value="string"/>
+    <gmres_restart_iterations type="child" value="int"/>
+    <pc                       type="child" value="string"/>
+    <schur                    type="child" value="string"/>
+    <block                    type="child" value="string"/>
+    <atol                     type="child" value="float"/>
+    <rtol                     type="child" value="float"/>
+    <dtol                     type="child" value="float"/>
+    <maxits                   type="child" value="int"/>
+  </linearsolver>
+
+  <eigensolver>
+    <mode  type="child" value="int"/>
+    <nev   type="child" value="int"/>
+    <ncv   type="child" value="int"/>
+    <shift type="child" value="int"/>
+  </eigensolver>
+
+  <postprocessing>
+    <dump_lhs_matrix type="child" value="string" help="Filename: Write left-hand-side matrix to file for debugging purposes">
+      <format type="attribute" value="enum">
+        <enum>Matlab</enum>
+        <enum>Cout</enum>
+      </format>
+      <step type="attribute" value="int"/>
+    </dump_lhs_matrix>
+    <dump_rhs_vector type="child" value="string" help="Filename: Write right-hand-side vector(s) to file for debugging purposes">
+      <format type="attribute" value="enum">
+        <enum>Matlab</enum>
+        <enum>Cout</enum>
+      </format>
+      <step type="attribute" value="int"/>
+    </dump_rhs_vector>
+    <dump_sol_vector type="child" value="string" help="Filename: Write solution vector to file for debugging purposes">
+      <format type="attribute" value="enum">
+        <enum>Matlab</enum>
+        <enum>Cout</enum>
+      </format>
+      <step type="attribute" value="int"/>
+    </dump_sol_vector>
+
+    <vtfformat type="child" value="enum" help="Filetype: save results to GLview (.vtf) native file. Either ASCII or BINARY">
+      <enum>ASCII</enum>
+      <enum>Binary</enum>
+      <nviz type="attribute" value="int" help="Number of visualization points per knot span in all directions"/>
+      <nu   type="attribute" value="int" help="Number of visualization points per knot span in the u-direction"/>
+      <nv   type="attribute" value="int" help="Number of visualization points per knot span in the v-direction"/>
+      <nw   type="attribute" value="int" help="Number of visualization points per knot span in the w-direction"/>
+    </vtfformat>
+    <stride type="child"   value="int">
+      <dt type="attribute" value="int"/>
+    </stride>
+    <hdf5 type="child"   value="string" help="Filename: save results as a Hierarchical Data format (.hdf5) file"/>
+    <primarySolOnly type="child" value="bool"/>
+    <projection type="child" array="true">
+      <type type="attribute" value="enum">
+        <enum>global</enum>
+        <enum>dgl2</enum>
+        <enum>cgl2</enum>
+        <enum>scr</enum>
+        <enum>vdsa</enum>
+        <enum>quasi</enum>
+        <enum>lsq</enum>
+      </type>
+    </projection>
+  </postprocessing>
+
+  <console>
+    <logging type="child">
+      <output_pid    type="attribute" value="int"/>
+      <output_prefix type="attribute" value="string"/>
+    </logging>
+  </console>
+
+  <discretization>
+    <discretization type="child" value="enum">
+      <enum>splines</enum>
+      <enum>lrsplines</enum>
+      <enum>lagrange</enum>
+      <enum>spectral</enum>
+    </discretization>
+    <nGauss type="child" value="int"/>
+  </discretization>
+
+</simulation>
