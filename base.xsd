@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+<xs:simpleType name="intArray">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="[0-9 ]+"/>
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="patchfile">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="bsplines"/>
+    <xs:enumeration value="lrsplines"/>
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="discretization">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="splines"/>
+    <xs:enumeration value="lrsplines"/>
+    <xs:enumeration value="lagrange"/>
+    <xs:enumeration value="spectral"/>
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="preconditioner">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="compositedir"/>
+    <xs:enumeration value="asmlu"/>
+    <xs:enumeration value="hypre"/>
+    <xs:enumeration value="asm"/>
+    <xs:enumeration value="gasm"/>
+    <xs:enumeration value="ml"/>
+    <xs:enumeration value="ilu"/>
+    <xs:enumeration value="gamg"/>
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="linearsolver">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="dense"/>
+    <xs:enumeration value="spr"/>
+    <xs:enumeration value="superlu"/>
+    <xs:enumeration value="samg"/>
+    <xs:enumeration value="petsc"/>
+    <xs:enumeration value="istl"/>
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="scheme">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="isotropic_function"/>
+    <xs:enumeration value="fullspan"/>
+    <xs:enumeration value="minspan"/>
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="poisson-anasol">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="square"/>
+    <xs:enumeration value="lshape"/>
+    <xs:enumeration value="sinussquare"/>
+    <xs:enumeration value="interiorlayer"/>
+    <xs:enumeration value="expression"/>
+  </xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="integer-or-null">
+  <xs:union>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:length value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer"/>
+    </xs:simpleType>
+  </xs:union>
+</xs:simpleType>
+<xs:simpleType name="positiveInteger-or-null">
+  <xs:union>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:length value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType>
+      <xs:restriction base="xs:positiveInteger"/>
+    </xs:simpleType>
+  </xs:union>
+</xs:simpleType>
+<xs:simpleType name="double-or-null">
+  <xs:union>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:length value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType>
+      <xs:restriction base="xs:double"/>
+    </xs:simpleType>
+  </xs:union>
+</xs:simpleType>
+<xs:complexType name="ifem-integer">
+  <xs:simpleContent>
+    <xs:extension base="integer-or-null">
+      <xs:attribute name="value" type="xs:integer"/>
+    </xs:extension>
+  </xs:simpleContent>
+</xs:complexType>
+<xs:complexType name="ifem-positiveInteger">
+  <xs:simpleContent>
+    <xs:extension base="positiveInteger-or-null">
+      <xs:attribute name="value" type="xs:positiveInteger"/>
+    </xs:extension>
+  </xs:simpleContent>
+</xs:complexType>
+<xs:complexType name="ifem-double">
+  <xs:simpleContent>
+    <xs:extension base="double-or-null">
+      <xs:attribute name="value" type="xs:double"/>
+    </xs:extension>
+  </xs:simpleContent>
+</xs:complexType>
+
+<xs:element name="simulation">
+  <xs:complexType>
+    <xs:all>
+
+
+      <!--   *****  GEOMETRY  *****    -->
+
+      <xs:element name="geometry" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="patchfile" minOccurs="0">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:string">
+                    <xs:attribute name="type" type="patchfile"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="nodefile"   type="xs:string" minOccurs="0"/>
+            <xs:element name="raiseorder"                  minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="patch" type="xs:nonNegativeInteger"/>
+                <xs:attribute name="u"     type="xs:nonNegativeInteger"/>
+                <xs:attribute name="v"     type="xs:nonNegativeInteger"/>
+                <xs:attribute name="w"     type="xs:nonNegativeInteger"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="refine"                     minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="patch"      type="xs:nonNegativeInteger"/>
+                <xs:attribute name="lowerpatch" type="xs:nonNegativeInteger"/>
+                <xs:attribute name="upperpatch" type="xs:nonNegativeInteger"/>
+                <xs:attribute name="u"          type="xs:nonNegativeInteger"/>
+                <xs:attribute name="v"          type="xs:nonNegativeInteger"/>
+                <xs:attribute name="w"          type="xs:nonNegativeInteger"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="topologysets"               minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="set" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="item" minOccurs="1" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="intArray">
+                                <xs:attribute name="patch" type="xs:nonNegativeInteger"/>
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="name" type="xs:string"/>
+                      <xs:attribute name="type">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="vertex"/>
+                            <xs:enumeration value="point"/>
+                            <xs:enumeration value="edge"  />
+                            <xs:enumeration value="curve"  />
+                            <xs:enumeration value="face"  />
+                            <xs:enumeration value="surface"  />
+                            <xs:enumeration value="volume"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+          </xs:sequence>
+          <xs:attribute name="dim"   default="2">
+            <xs:simpleType>
+              <xs:restriction base="xs:int">
+                <xs:enumeration value="1"/>
+                <xs:enumeration value="2"/>
+                <xs:enumeration value="3"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="scale"    default="1.0"   type="xs:double"/>
+          <xs:attribute name="L"        default="1.0"   type="xs:double"/>
+          <xs:attribute name="rational" default="0"     type="xs:boolean"/>
+          <xs:attribute name="X0"       default="0 0 0" type="xs:string"/>
+          <xs:attribute name="X1"       default="0 0 0" type="xs:string"/>
+          <xs:attribute name="Lx"       default="1.0"   type="xs:double"/>
+          <xs:attribute name="Ly"       default="1.0"   type="xs:double"/>
+          <xs:attribute name="Lz"       default="1.0"   type="xs:double"/>
+        </xs:complexType>
+      </xs:element>
+
+
+      <!--   *****  BOUNDARYCONDITIONS  *****    -->
+
+      <xs:element name="boundaryconditions" minOccurs="0">
+        <xs:complexType>
+          <xs:choice maxOccurs="unbounded">
+            <xs:element name="propertyfile" type="xs:string" minOccurs="0"/>
+            <xs:element name="propertycodes"                 minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="code">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="patch">
+                          <xs:complexType>
+                            <xs:attribute name="index"  type="xs:positiveInteger"/>
+                            <xs:attribute name="edge"   type="xs:positiveInteger"/>
+                            <xs:attribute name="vertex" type="xs:positiveInteger"/>
+                            <xs:attribute name="face"   type="xs:positiveInteger"/>
+                            <xs:attribute name="volume" type="xs:positiveInteger"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="value" type="xs:integer"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="neumann" minOccurs="0">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:string">
+                    <xs:attribute name="set"       type="xs:string"/>
+                    <xs:attribute name="direction" type="xs:integer"/>
+                    <xs:attribute name="code"      type="xs:integer"/>
+                    <xs:attribute name="type" default="const">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="anasol" />
+                          <xs:enumeration value="generic"/>
+                          <xs:enumeration value="const"  />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="dirichlet" minOccurs="0">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:string">
+                    <xs:attribute name="set"       type="xs:string"/>
+                    <xs:attribute name="code"      type="xs:integer"/>
+                    <xs:attribute name="basis"     type="xs:integer"/>
+                    <xs:attribute name="comp"      type="xs:integer"/>
+                    <xs:attribute name="component" type="xs:integer"/>
+                    <xs:attribute name="type" default="const">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="anasol" />
+                          <xs:enumeration value="field"/>
+                          <xs:enumeration value="expression"/>
+                          <xs:enumeration value="const"  />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="axes" default="global">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="local projected" />
+                          <xs:enumeration value="local"/>
+                          <xs:enumeration value="global"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+
+
+      <!--   *****  EIGENSOLVER  *****    -->
+
+      <xs:element name="eigensolver" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="mode"  type="xs:positiveInteger" minOccurs="0"/>
+            <xs:element name="nev"   type="xs:positiveInteger" minOccurs="0"/>
+            <xs:element name="ncv"   type="xs:positiveInteger" minOccurs="0"/>
+            <xs:element name="shift" type="xs:positiveInteger" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+
+
+      <!--   *****  LINEARSOLVER  *****    -->
+
+      <xs:element name="linearsolver" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="type"      type="xs:string"            minOccurs="0"/>
+            <xs:element name="pc"        type="preconditioner"       minOccurs="0"/>
+            <xs:element name="package"   type="xs:string"            minOccurs="0"/>
+            <xs:element name="levels"    type="ifem-positiveInteger" minOccurs="0"/>
+            <xs:element name="atol"      type="ifem-double"          minOccurs="0"/>
+            <xs:element name="rtol"      type="ifem-double"          minOccurs="0"/>
+            <xs:element name="dtol"      type="ifem-double"          minOccurs="0"/>
+            <xs:element name="maxits"    type="ifem-positiveInteger" minOccurs="0"/>
+            <xs:element name="schur"     type="ifem-positiveInteger" minOccurs="0"/>
+            <xs:element name="gmres_restart_iterations" type="ifem-positiveInteger" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="class"     type="linearsolver"/>
+          <xs:attribute name="verbosity" type="xs:positiveInteger"/>
+        </xs:complexType>
+      </xs:element>
+
+
+      <!--   *****  DISCRETIZATION  *****    -->
+
+      <xs:element name="discretization" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="nGauss" type="intArray"       minOccurs="0"/>
+            <xs:element name="type"   type="discretization" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="nGauss" type="intArray"      />
+          <xs:attribute name="type"   type="discretization"/>
+        </xs:complexType>
+      </xs:element>
+
+
+      <!--   *****  ADAPTIVE  *****    -->
+
+      <xs:element name="adaptive" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="maxstep"                  type="ifem-positiveInteger" minOccurs="0"/>
+            <xs:element name="maxdof"                   type="ifem-positiveInteger" minOccurs="0"/>
+            <xs:element name="beta"                     type="ifem-double"          minOccurs="0"/>
+            <xs:element name="errtol"                   type="ifem-double"          minOccurs="0"/>
+            <xs:element name="knot_mult"                type="ifem-positiveInteger" minOccurs="0"/>
+            <xs:element name="use_norm"                 type="ifem-integer"         minOccurs="0"/>
+            <xs:element name="use_sub_norm"             type="ifem-positiveInteger" minOccurs="0"/>
+            <xs:element name="store_eps_mesh"                                       minOccurs="0"/>
+            <xs:element name="test_linear_independence"                             minOccurs="0"/>
+            <xs:element name="scheme"                                               minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="value" default="isotropic_function" type="scheme"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+
+
+      <!--   *****  POISSON  *****    -->
+
+      <xs:element name="poisson" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="isotropic" minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="kappa" type="xs:double"/>
+                <xs:attribute name="code"  type="xs:integer"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="anasol"  minOccurs="0">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="primary"   minOccurs="0"/>
+                  <xs:element name="secondary" minOccurs="0"/>
+                  <xs:element name="variables" minOccurs="0"/>
+                </xs:all>
+                <xs:attribute name="type" type="poisson-anasol"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="source"  minOccurs="0">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:string">
+                    <xs:attribute name="type" type="poisson-anasol"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="galerkin"  type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>

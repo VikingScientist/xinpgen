@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<simulation>
+    <!-- General - geometry definitions !-->
+    <geometry>
+        <patchfile type="bsplines">lshape.g2</patchfile>
+        <raiseorder patch="1" u="2" v="2"/>
+        <refine patch="1" u="7" v="7"/>
+        <topologysets>
+          <set name="Homogenous" type="edge">
+            <item patch="1">3</item>
+          </set>
+          <set name="Neumann" type="edge">
+            <item patch="1">1</item>
+            <item patch="1">2</item>
+            <item patch="1">4</item>
+          </set>
+        </topologysets>
+    </geometry>
+    <!-- General - boundary conditions !-->
+    <boundaryconditions>
+        <dirichlet set="Homogenous" comp="1"/>
+        <neumann set="Neumann" type="anasol"/>
+    </boundaryconditions>
+    <!-- General - linear solver parameters !-->
+    <linearsolver>
+        <type>cg</type>
+        <pc>ilu</pc>
+        <package>petsc</package>
+        <levels>2</levels>
+        <atol>1.0e-12</atol>
+        <rtol>1.0e-12</rtol>
+        <dtol>1.0e6</dtol>
+        <maxits>5000</maxits>
+    </linearsolver>
+    <!-- App specific block !-->
+    <poisson>
+      <anasol type="expression">
+        <variables>
+          R=sqrt(x*x+y*y);
+          th=if(above(x,0),asin(y/sqrt(x*x+y*y)),PI-asin(y/sqrt(x*x+y*y)));
+          Rp=R^(-1/3)
+        </variables>
+        <secondary>
+          2/3*Rp*sin(th/3)|-2/3*Rp*cos(th/3)
+        </secondary>
+      </anasol>
+    </poisson>
+</simulation>

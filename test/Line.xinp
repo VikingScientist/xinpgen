@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <!-- General - geometry definitions !-->
+  <geometry L="2.0">
+    <raiseorder patch="1" u="2"/>
+    <refine patch="1" u="7"/>
+    <topologysets>
+      <set name="Homogenous" type="vertex">
+        <item patch="1">1</item>
+      </set>
+      <set name="Neumann" type="vertex">
+        <item patch="1">2</item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <!-- General - boundary conditions !-->
+  <boundaryconditions>
+    <dirichlet set="Homogenous" comp="1"/>
+    <neumann set="Neumann" type="anasol"/>
+  </boundaryconditions>
+
+  <!-- Problem-specific block !-->
+  <poisson>
+    <source type="expression">PI*PI/4*sin(PI*x/2)</source>
+    <anasol type="expression">
+      <primary>-sin(x*PI/2)</primary>
+      <secondary>-PI/2*cos(x*PI/2)</secondary>
+    </anasol>
+  </poisson>
+
+</simulation>

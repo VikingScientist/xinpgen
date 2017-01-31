@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<simulation>
+
+  <geometry scale="2">
+    <raiseorder patch="1" u="0" v="0"/>
+    <refine patch="1" u="3" v="3"/>
+    <topologysets>
+      <set name="corners" type="vertex">
+        <item patch="1">1 2 3 4</item>
+      </set>
+      <set name="sides" type="edge">
+        <item patch="1">1 2 3 4</item>
+      </set>
+      <set name="vertical" type="edge">
+        <item patch="1">1 2</item>
+        </set>
+      <set name="horizontal" type="edge">
+        <item patch="1">3 4</item>
+        </set>
+    </topologysets>
+  </geometry>
+
+  <stokes>
+    <boundaryconditions>
+      <dirichlet set="sides" basis="1" comp="1" type="expression">x</dirichlet>
+      <dirichlet set="sides" basis="1" comp="2" type="expression">-y</dirichlet>
+      <dirichlet set="corners" basis="2" comp="1">1.5</dirichlet>
+    </boundaryconditions>
+    <constrain_integrated_pressure>6</constrain_integrated_pressure>
+    <fluidproperties mu="1.0" rho="1.0"/>
+    <gravity x="0.0" y="0.0" z="0.0"/>
+    <anasol type="expression">
+      <variables>u=x;
+                 ux=1;
+                 uy=0;
+                 v=-y;
+                 vx=0;
+                 vy=-1;
+                 p=1.5;
+      </variables>
+      <primary>u|v|p</primary>
+      <scalarprimary>p</scalarprimary>
+      <secondary>ux|uy|vx|vy</secondary>
+    </anasol>
+  </stokes>
+
+  <discretization>
+    <nGauss>3</nGauss>
+  </discretization>
+
+</simulation>

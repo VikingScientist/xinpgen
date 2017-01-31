@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <geometry>
+    <patchfile>Backstep2D.g2</patchfile>
+    <nodefile>Backstep2D.gno</nodefile>
+    <topologysets>
+      <set name="inflow" type="edge" closure="open">
+        <item patch="1">1</item>
+      </set>
+      <set name="outflow" type="edge">
+        <item patch="2">2</item>
+        <item patch="3">2</item>
+      </set>
+      <set name="walls" type="edge">
+        <item patch="1">3 4</item>
+        <item patch="2">1 3</item>
+        <item patch="3">4</item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <timestepping start="0" end="0.5" dt="0.1"/>
+
+  <fswalldistance>
+    <wall_value>1</wall_value>
+    <boundaryconditions>
+      <dirichlet set="walls" comp="1">1</dirichlet>
+    </boundaryconditions>
+    <nonlinearsolver>
+      <dtol>1.0e4</dtol>
+    </nonlinearsolver>
+  </fswalldistance>
+
+  <spalartallmaras>
+    <boundaryconditions>
+      <dirichlet set="inflow" comp="-1">0.001655</dirichlet>
+      <dirichlet set="walls" comp="1"/>
+    </boundaryconditions>
+    <nonlinearsolver>
+      <maxits>20</maxits>
+      <rtol>9.0e-1</rtol>
+      <atol>1.0e-10</atol>
+    </nonlinearsolver>
+  </spalartallmaras>
+
+  <stokes>
+    <fluidproperties mu="0.00125" rho="1.0"/>
+  </stokes>
+
+  <chorin>
+    <gravity x="0" y="-1.0" bodyforces="off"/>
+    <boundaryconditions>
+      <dirichlet set="inflow" comp="-1" type="expression">y*(2-y)</dirichlet>
+      <dirichlet set="inflow" comp="2"/>
+      <dirichlet set="walls" comp="12"/>
+    </boundaryconditions>
+    <rotationalformulation/>
+    <boundaryforce set="walls" stride="1"/>
+  </chorin>
+
+  <advectiondiffusion>
+    <boundaryconditions>
+      <dirichlet set="inflow" comp="1">1</dirichlet>
+      <neumann set="walls" comp="1"/>
+      <kappa>0.00125</kappa>
+    </boundaryconditions>
+  </advectiondiffusion>
+
+  <velocityprediction>
+    <linearsolver>
+      <type>gmres</type>
+      <pc>ilu</pc>
+      <package>petsc</package>
+      <levels>2</levels>
+      <atol>1.0e-12</atol>
+      <rtol>1.0e-12</rtol>
+      <dtol>1.0e6</dtol>
+      <maxits>1000</maxits>
+    </linearsolver>
+  </velocityprediction>
+
+  <pressurecorrection>
+    <boundaryconditions>
+      <dirichlet set="outflow" comp="1"/>
+    </boundaryconditions>
+    <linearsolver>
+      <type>cg</type>
+      <pc>ilu</pc>
+      <package>petsc</package>
+      <levels>2</levels>
+      <atol>1.0e-12</atol>
+      <rtol>1.0e-12</rtol>
+      <dtol>1.0e6</dtol>
+      <maxits>5000</maxits>
+    </linearsolver>
+  </pressurecorrection>
+
+  <velocitycorrection>
+    <linearsolver>
+      <type>cg</type>
+      <pc>ilu</pc>
+      <package>petsc</package>
+      <levels>2</levels>
+      <atol>1.0e-12</atol>
+      <rtol>1.0e-12</rtol>
+      <dtol>1.0e6</dtol>
+      <maxits>5000</maxits>
+    </linearsolver>
+  </velocitycorrection>
+
+</simulation>

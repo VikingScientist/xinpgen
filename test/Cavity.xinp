@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<simulation>
+
+  <geometry>
+    <refine patch="1" u="8" v="8" />
+    <topologysets>
+      <set name="B1" type="edge">
+        <item patch="1">1 2 3</item>
+      </set>
+      <set name="B2" type="edge">
+        <item patch="1">4</item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <stokes>
+    <boundaryconditions>
+      <dirichlet set="B2" comp="1" type="expression">16*pow(pow(x,2)-x,2)*sin(t)</dirichlet>
+      <dirichlet set="B2" comp="2"/>
+      <dirichlet set="B1" comp="12"/>
+      <dirichlet set="B2" comp="3" type="expression">(-96*(2*x-1)*(pow(y,5)/5-pow(y,3)/3)-16*(4*pow(x,3)-6*pow(x,2)+2*x)*(2*pow(y,3)-y))*sin(t)</dirichlet>
+    </boundaryconditions>
+    <source type="expression"
+            variables="u=16*pow(pow(x,2)-x,2)*(2*pow(y,3)-y);
+                       uxx=32*(2*(pow(x,2)-x)+pow(2*x-1,2))*(2*pow(y,3)-y);
+                       uyy=16*pow(pow(x,2)-x,2)*12*y;
+                       v=-16*x*(2*pow(x,2)-3*x+1)*(pow(y,4)-pow(y,2));
+                       vxx=-16*(12*x-6)*(pow(y,4)-pow(y,2));
+                       vyy=-16*x*(2*pow(x,2)-3*x+1)*(12*pow(y,2)-2);
+                       px=-96*2*(pow(y,5)/5-pow(y,3)/3)-16*(12*pow(x,2)-12*x+2)*(2*pow(y,3)-y);
+                       py=-96*(2*x-1)*(pow(y,4)-pow(y,2))-16*(4*pow(x,3)-6*pow(x,2)+2*x)*(6*pow(y,2)-1);">
+            u*cos(t)+(px-uxx-uyy)*sin(t)|v*cos(t)+(py-vxx-vyy)*sin(t)
+    </source>
+
+    <fluidproperties mu="1.0" rho="1.0"/>
+    <gravity x="0" y="0" z="0"/>
+    <anasol type="expression">
+      <variables>u=16*pow(pow(x,2)-x,2)*(2*pow(y,3)-y);
+                 ux=32*(2*x-1)*(pow(x,2)-x)*(2*pow(y,3)-y);
+                 uy=16*pow(pow(x,2)-x,2)*(6*pow(y,2)-1);
+                 v=-16*x*(2*pow(x,2)-3*x+1)*(pow(y,4)-pow(y,2));
+                 vx=(-16*(2*pow(x,2)-3*x+1)-16*x*(4*x-3))*(pow(y,4)-pow(y,2));
+                 vy=-16*x*(2*pow(x,2)-3*x+1)*2*(2*pow(y,3)-y);
+                 p=-96*(2*x-1)*(pow(y,5)/5-pow(y,3)/3)-16*(4*pow(x,3)-6*pow(x,2)+2*x)*(2*pow(y,3)-y);
+      </variables>
+      <primary>u*sin(t)|v*sin(t)|p*sin(t)</primary>
+      <scalarprimary>p*sin(t)</scalarprimary>
+      <secondary>ux*sin(t)|uy*sin(t)|vx*sin(t)|vy*sin(t)</secondary>
+    </anasol>
+  </stokes>
+
+  <chorin>
+    <boundaryconditions>
+      <dirichlet set="B2" comp="1" type="expression">16*pow(pow(x,2)-x,2)*sin(t)</dirichlet>
+      <dirichlet set="B2" comp="2"/>
+      <dirichlet set="B1" comp="12"/>
+    </boundaryconditions>
+  </chorin>
+
+  <pressurecorrection>
+    <boundaryconditions>
+      <dirichlet set="B2" comp="1" type="expression">-96*(2*x-1)*(pow(y,5)/5-pow(y,3)/3)-16*(4*pow(x,3)-6*pow(x,2)+2*x)*(2*pow(y,3)-y)*sin(t)</dirichlet>
+    </boundaryconditions>
+  </pressurecorrection>
+
+  <timestepping start="0.0" end="0.5" dt="0.05"/>
+</simulation>
